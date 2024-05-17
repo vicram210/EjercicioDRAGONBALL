@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     const apiUrl = "https://dragonball-api.com/api/characters";
+    let currentPageUrl = apiUrl;
     const charactersListBody = document.getElementById("characters-list");
     const characterInfoContainer = document.getElementById("character-info");
     const searchNameInput = document.getElementById("search-name");
@@ -11,10 +12,18 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .then(data => {
                 charactersListBody.innerHTML = ""; // Limpiar lista anterior
-                data.forEach(character => {
+                data.items.forEach(character => {
                     const row = `<tr data-id="${character.id}"><td>${character.id}</td><td>${character.name}</td></tr>`;
                     charactersListBody.insertAdjacentHTML("beforeend", row);
                 });
+
+                // Configuración de botones de paginación
+                document.getElementById("prev-btn").style.display = data.meta.prev ? "inline-block" : "none";
+                document.getElementById("next-btn").style.display = data.meta.next ? "inline-block" : "none";
+                document.getElementById("prev-btn").onclick = () => fetchCharacterList(data.meta.prev);
+                document.getElementById("next-btn").onclick = () => fetchCharacterList(data.meta.next);
+
+                currentPageUrl = url;
             })
             .catch(error => console.error("Error al obtener la lista de personajes:", error));
     }
