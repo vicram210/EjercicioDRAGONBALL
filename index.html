@@ -20,24 +20,24 @@
       text-align: left;
     }
 
-    #character-details {
+    #detalles-personaje {
       margin-top: 20px;
     }
 
-    #character-details img {
+    #detalles-personaje img {
       max-width: 200px;
       height: auto;
     }
 
-    .search-box {
+    .caja-busqueda {
       margin-bottom: 10px;
     }
 
-    .search-input {
+    .input-busqueda {
       margin-right: 10px;
     }
 
-    .character-info {
+    .info-personaje {
       padding: 16px;
       border-radius: 8px;
     }
@@ -46,21 +46,21 @@
 <body>
   <h1>Dragon Ball Z</h1>
 
-  <div class="search-box">
-    <label for="name">Nombre:</label>
-    <input type="text" id="name" class="search-input" placeholder="Nombre del personaje">
-    <label for="race">Raza:</label>
-    <input type="text" id="race" class="search-input" placeholder="Raza del personaje">
-    <label for="gender">Género:</label>
-    <select id="gender" class="search-input">
+  <div class="caja-busqueda">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" class="input-busqueda" placeholder="Nombre del personaje">
+    <label for="raza">Raza:</label>
+    <input type="text" id="raza" class="input-busqueda" placeholder="Raza del personaje">
+    <label for="genero">Género:</label>
+    <select id="genero" class="input-busqueda">
       <option value="Todo">Todo</option>
       <option value="Male">Masculino</option>
       <option value="Female">Femenino</option>
     </select>
-    <button onclick="searchCharacters()">Buscar</button>
+    <button onclick="buscarPersonajes()">Buscar</button>
   </div>
 
-  <table id="character-table">
+  <table id="tabla-personajes">
     <thead>
       <tr>
         <th>ID</th>
@@ -69,124 +69,124 @@
         <th>Género</th>
       </tr>
     </thead>
-    <tbody id="character-list"></tbody>
+    <tbody id="lista-personajes"></tbody>
   </table>
 
-  <div class="pagination">
-    <button id="prev-btn" onclick="previousPage()">Anterior</button>
-    <button id="next-btn" onclick="nextPage()">Siguiente</button>
+  <div class="paginacion">
+    <button id="btn-anterior" onclick="paginaAnterior()">Anterior</button>
+    <button id="btn-siguiente" onclick="paginaSiguiente()">Siguiente</button>
   </div>
 
-  <div id="character-details"></div>
+  <div id="detalles-personaje"></div>
 
   <script>
-    let currentPage = 1;
+    let paginaActual = 1;
 
-    function fetchCharacters(url) {
+    function obtenerPersonajes(url) {
       fetch(url)
         .then(response => response.json())
         .then(data => {
-          displayCharacters(data);
-          updatePaginationButtons(currentPage, data.meta.totalPages);
+          mostrarPersonajes(data);
+          actualizarBotonesPaginacion(paginaActual, data.meta.totalPages);
         })
-        .catch(error => console.error('Error fetching characters:', error));
+        .catch(error => console.error('Error al obtener personajes:', error));
     }
 
-    function displayCharacters(data) {
-      const characterList = document.getElementById('character-list');
-      characterList.innerHTML = '';
-      data.items.forEach(character => {
-        const row = document.createElement('tr');
-        row.dataset.id = character.id;
+    function mostrarPersonajes(data) {
+      const listaPersonajes = document.getElementById('lista-personajes');
+      listaPersonajes.innerHTML = '';
+      data.items.forEach(personaje => {
+        const fila = document.createElement('tr');
+        fila.dataset.id = personaje.id;
 
-        const idCell = document.createElement('td');
-        idCell.textContent = character.id;
+        const celdaId = document.createElement('td');
+        celdaId.textContent = personaje.id;
 
-        const nameCell = document.createElement('td');
-        nameCell.textContent = character.name;
+        const celdaNombre = document.createElement('td');
+        celdaNombre.textContent = personaje.name;
 
-        const raceCell = document.createElement('td');
-        raceCell.textContent = character.race;
+        const celdaRaza = document.createElement('td');
+        celdaRaza.textContent = personaje.race;
 
-        const genderCell = document.createElement('td');
-        genderCell.textContent = character.gender;
+        const celdaGenero = document.createElement('td');
+        celdaGenero.textContent = personaje.gender;
 
-        row.appendChild(idCell);
-        row.appendChild(nameCell);
-        row.appendChild(raceCell);
-        row.appendChild(genderCell);
+        fila.appendChild(celdaId);
+        fila.appendChild(celdaNombre);
+        fila.appendChild(celdaRaza);
+        fila.appendChild(celdaGenero);
 
-        row.addEventListener('click', () => showCharacterDetails(character.id));
+        fila.addEventListener('click', () => mostrarDetallesPersonaje(personaje.id));
 
-        characterList.appendChild(row);
+        listaPersonajes.appendChild(fila);
       });
     }
 
-    function searchCharacters() {
-      const name = document.getElementById('name').value.trim();
-      const race = document.getElementById('race').value.trim();
-      const gender = document.getElementById('gender').value;
+    function buscarPersonajes() {
+      const nombre = document.getElementById('nombre').value.trim();
+      const raza = document.getElementById('raza').value.trim();
+      const genero = document.getElementById('genero').value;
 
       let url = 'https://dragonball-api.com/api/characters?';
 
-      if (name) {
-        url += `name=${encodeURIComponent(name)}&`;
+      if (nombre) {
+        url += `name=${encodeURIComponent(nombre)}&`;
       }
-      if (race) {
-        url += `race=${encodeURIComponent(race)}&`;
+      if (raza) {
+        url += `race=${encodeURIComponent(raza)}&`;
       }
-      if (gender && gender !== 'Todo') {
-        url += `gender=${encodeURIComponent(gender)}&`;
+      if (genero && genero !== 'Todo') {
+        url += `gender=${encodeURIComponent(genero)}&`;
       }
 
-      url += `limit=10&page=${currentPage}`;
+      url += `limit=10&page=${paginaActual}`;
 
-      fetchCharacters(url);
+      obtenerPersonajes(url);
     }
 
-    function showCharacterDetails(characterId) {
-      const detailsContainer = document.getElementById('character-details');
+    function mostrarDetallesPersonaje(idPersonaje) {
+      const detallesContenedor = document.getElementById('detalles-personaje');
 
-      fetch(`https://dragonball-api.com/api/characters/${characterId}`)
+      fetch(`https://dragonball-api.com/api/characters/${idPersonaje}`)
         .then(response => response.json())
-        .then(character => {
-          detailsContainer.innerHTML = `
-            <div class="character-info">
-              <h2>${character.name}</h2>
-              <img src="${character.image}" alt="${character.name}">
-              <p><strong>Race:</strong> ${character.race}</p>
-              <p><strong>Gender:</strong> ${character.gender}</p>
-              <p><strong>Ki:</strong> ${character.ki}</p>
-              <p><strong>Max Ki:</strong> ${character.maxKi}</p>
-              <p><strong>Description:</strong> ${character.description}</p>
+        .then(personaje => {
+          detallesContenedor.innerHTML = `
+            <div class="info-personaje">
+              <h2>${personaje.name}</h2>
+              <img src="${personaje.image}" alt="${personaje.name}">
+              <p><strong>Raza:</strong> ${personaje.race}</p>
+              <p><strong>Género:</strong> ${personaje.gender}</p>
+              <p><strong>Ki:</strong> ${personaje.ki}</p>
+              <p><strong>Ki Máximo:</strong> ${personaje.maxKi}</p>
+              <p><strong>Descripción:</strong> ${personaje.description}</p>
             </div>
           `;
         })
-        .catch(error => console.error('Error fetching character details:', error));
+        .catch(error => console.error('Error al obtener detalles del personaje:', error));
     }
 
-    function updatePaginationButtons(currentPage, totalPages) {
-      const prevButton = document.getElementById('prev-btn');
-      const nextButton = document.getElementById('next-btn');
+    function actualizarBotonesPaginacion(paginaActual, totalPaginas) {
+      const btnAnterior = document.getElementById('btn-anterior');
+      const btnSiguiente = document.getElementById('btn-siguiente');
 
-      prevButton.disabled = currentPage <= 1;
-      nextButton.disabled = currentPage >= totalPages;
+      btnAnterior.disabled = paginaActual <= 1;
+      btnSiguiente.disabled = paginaActual >= totalPaginas;
     }
 
-    function previousPage() {
-      if (currentPage > 1) {
-        currentPage--;
-        searchCharacters();
+    function paginaAnterior() {
+      if (paginaActual > 1) {
+        paginaActual--;
+        buscarPersonajes();
       }
     }
 
-    function nextPage() {
-      currentPage++;
-      searchCharacters();
+    function paginaSiguiente() {
+      paginaActual++;
+      buscarPersonajes();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      fetchCharacters(`https://dragonball-api.com/api/characters?limit=10&page=1`);
+      obtenerPersonajes(`https://dragonball-api.com/api/characters?limit=10&page=1`);
     });
   </script>
 </body>
