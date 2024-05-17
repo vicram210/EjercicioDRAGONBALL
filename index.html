@@ -1,38 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personajes de Dragon Ball Z</title>
-    <link rel="stylesheet" href="CSSdragonball.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dragon Ball Z API</title>
+  <style>
+    body {
+    font-family: Arial, sans-serif;
+    }
+
+    table {
+        width: 50%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    #character-details {
+      margin-top: 20px;
+    }
+    #character-details img {
+      max-width: 200px;
+      height: auto;
+    }
+    .search-box {
+      margin-bottom: 10px;
+    }
+    .search-input {
+      margin-right: 10px;
+    }
+
+    .character-info {
+      padding: 16px;
+      border-radius: 8px;
+    }
+
+
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Personajes de Dragon Ball Z</h1>
-        
-        <div class="search-container">
-            <input type="text" id="search-name" placeholder="Buscar por nombre">
-            <input type="text" id="search-gender" placeholder="Buscar por género">
-            <input type="text" id="search-race" placeholder="Buscar por raza">
-            <button id="search-btn">Buscar</button>
-        </div>
-
-        <table id="characters-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                </tr>
-            </thead>
-            <tbody id="characters-list"></tbody>
-        </table>
-
-        <div id="character-info"></div>
-        <div class="pagination">
-            <button id="prev-btn">Atrás</button>
-            <button id="next-btn">Adelante</button>
-        </div>
+    <h1>Dragon Ball Z Characters</h1>
+  
+    <div class="search-box">
+      <label for="name">Nombre:</label>
+      <input type="text" id="name" class="search-input" placeholder="Nombre del personaje">
+      <label for="race">Raza:</label>
+      <input type="text" id="race" class="search-input" placeholder="Raza del personaje">
+      <label for="gender">Género:</label>
+      <select id="gender" class="search-input">
+        <option value="">Todo</option>
+        <option value="Male">Masculino</option>
+        <option value="Female">Femenino</option>
+      </select>
+      <button onclick="searchCharacters()">Buscar</button>
     </div>
-    <script src="dragonball.js"></script>
-</body>
-</html>
+  
+    <table id="character-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Raza</th>
+          <th>Género</th>
+        </tr>
+      </thead>
+      <tbody id="character-list"></tbody>
+    </table>
+  
+    <div id="character-details"></div>
+  
+    <script>
+      function fetchCharacters(url) {
+        fetch(url)
+          .then(response => response.json())
+          .then(data => displayCharacters(data));
+      }
+  
+      function displayCharacters(characters) {
+        const characterList = document.getElementById('character-list');
+        characterList.innerHTML = '';
+        characters.forEach(character => {
+          const row = document.createElement('tr');
+          
+          const idCell = document.createElement('td');
+          idCell.textContent = character.id;
+  
+          const nameCell = document.createElement('td');
+          nameCell.textContent = character.name;
+  
+          const raceCell = document.createElement('td');
+          raceCell.textContent = character.race;
+  
+          const genderCell = document.createElement('td');
+          genderCell.textContent = character.gender;
+  
+          row.appendChild(idCell);
+          row.appendChild(nameCell);
+          row.appendChild(raceCell);
+          row.appendChild(genderCell);
+  
+          row.addEventListener('click', () => showCharacterDetails(character.id));
+  
+          characterList.appendChild(row);
+        });
+      }
+  
+      function searchCharacters() {
+        const name = document.getElementById('name').value.trim();
+        const race = document.getElementById('race').value.trim();
+        const gender = document.getElementById('gender').value.trim();
+        let url = 'https://dragonball-api.com/api/characters?';
+  
+        if (name) {
+          url += `name=${encodeURIComponent(name)}`;
+        }
+        if (race) {
+          url += `&race=${encodeURIComponent(race)}`;
+        }
+        if (gender) {
+          url += `&gender=${encodeURIComponent(gender)}`;
+        }
+  
+        fetchCharacters(url);
+      }
+  
+      function showCharacterDetails(characterId) {
+        const detailsContainer = document.getElementById('character-details');
+        detailsContainer.innerHTML = '<p>Cargando detalles del personaje...</p>';
+  
+        fetch(`https://dragonball-api.com/api/characters/${characterId}`)
+          .then(response => response.json())
+          .then(character => {
+            detailsContainer.innerHTML = `
+              <div class="character-info">
+                <h2>${character.name}</h2>
+                <img src="${character.image}" alt="${character.name}">
+                <p><strong>Raza:</strong> ${character.race}</p>
+                <p><strong>Género:</strong> ${character.gender}</p>
+                <p><strong>Ki:</strong> ${character.ki}</p>
+                <p><strong>Máximo Ki:</strong> ${character.maxKi}</p>
+                <p><strong>Descripción:</strong> ${character.description}</p>
+              </div>
+            `;
+          })
+          .catch(error => {
+            console.error('Error al cargar los detalles del personaje:', error);
+            detailsContainer.innerHTML = '<p>Ocurrió un error al cargar los detalles del personaje.</p>';
+          });
+      }
+  
+      // Cargar lista inicial de personajes
+      fetchCharacters('https://dragonball-api.com/api/characters');
+    </script>
+  </body>
+  </html>
