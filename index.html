@@ -43,7 +43,7 @@
   </style>
 </head>
 <body>
-  <h1>Dragon Ball Z Characters</h1>
+  <h1>Dragon Ball Z</h1>
 
   <div class="search-box">
     <label for="name">Nombre:</label>
@@ -71,12 +71,12 @@
     <tbody id="character-list"></tbody>
   </table>
 
-  <div id="character-details"></div>
-
   <div class="pagination">
     <button onclick="previousPage()">Anterior</button>
     <button onclick="nextPage()">Siguiente</button>
   </div>
+
+  <div id="character-details"></div>
 
   <script>
   let currentPage = 1;
@@ -143,7 +143,6 @@
     
     function showCharacterDetails(characterId) {
       const detailsContainer = document.getElementById('character-details');
-      detailsContainer.innerHTML = '<p>Loading character details...</p>';
     
       fetch(`https://dragonball-api.com/api/characters/${characterId}`)
         .then(response => response.json())
